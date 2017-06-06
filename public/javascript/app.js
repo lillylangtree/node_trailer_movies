@@ -8,6 +8,7 @@ angular.module('moviesDBApp', ['ngSanitize','ngRoute','movieDBControllers','Trai
         "apiKey": "35e16679c616a21b9ddebb66272c5902",
 		"omdbApiKey": "45e2e591",
         "rottenUri" : "https://www.omdbapi.com/",
+		"googleStaticMapApi": "AIzaSyD83VjfQVoZZblHeYSG2LqtAunkSuS8uBE",
         "posterPath": "http://image.tmdb.org/t/p/w370/",
        // "moviesSearchEndpoint": "https://www.omdbapi.com/",
         "myDataRef" : 'https://moviesci.firebaseio.com/',

@@ -69,17 +69,19 @@ angular.module('utilityControllers',[])
 });
 
 angular.module('movieDBControllers',[])
-.controller('AboutController',function($scope) {
+.controller('AboutController',function($scope,myMovieConfig) {
 // 
    $scope.title = 'About Us';
    $scope.maps = [{
         address: 'Trinity College Dublin, Dublin',
         zoom: 14,
-        width: 400      
+        width: 400 ,
+		apikey: myMovieConfig.googleStaticMapApi
         },{
         address: '51st Street, New York, New York',
         zoom: 14,
-        width: 400      
+        width: 400,
+		apikey: myMovieConfig.googleStaticMapApi
         }];
   $scope.map = $scope.maps[0];
 })

@@ -51,5 +51,9 @@ angular.module('moviesDBApp', ['ngSanitize','ngRoute','movieDBControllers','Trai
 		  	templateUrl: 'templates/movieDetails.html',
 		  	controller: 'MovieDetailsController'
 		  })
-		  .otherwise({redirectTo: '/popular'}); 
+		  .when("/error/:message/:status", {
+                templateUrl: "templates/error.html",
+                controller: 'MovieErrorController'
+            })
+		  .otherwise({redirectTo: '/'}); 
 	});

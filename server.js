@@ -31,12 +31,16 @@ app.use(express.static(path.join(__dirname, '/public')));
 app.use(bodyParser.urlencoded({extended: false}))
 app.use(bodyParser.json());
 //
-
+app.use(function (req, res, next) {
+  console.log('Middleware Time:', Date.now())
+  next()
+})
 app.get('/movieTrailer', function (req, res) {
     //this request should include a url for processing
     //this url will make an api call based on the url value
     if (!req.query.url) { //check get parameters for required fields
         res.send("Error");
+		console.log("after res send");
         return
     }
     var movieTrailerUrl = req.query.url; // get the search url from the request

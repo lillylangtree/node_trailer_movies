@@ -74,6 +74,8 @@ select {
 .fade.in { opacity:1; display:block; overflow-x: hidden;overflow-y: auto;}
 .fade.out { display:none;}
 
+.centerContent {justify-content: center;  text-align: center}
+
 .modal-dialog .container-fluid {
     padding-right: 0px; 
     padding-left: 0px; 

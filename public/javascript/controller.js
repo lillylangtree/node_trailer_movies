@@ -101,7 +101,7 @@ angular.module('movieDBControllers',[])
                     $scope.loading = false;
                 },
                 function (error) {
-                    $location.path('/error/' + error.statusText + '/' + error.status)
+                    throw error;
                 }
 			
             ).catch(
@@ -117,7 +117,7 @@ angular.module('movieDBControllers',[])
                     }
                 },
                 function (error) {
-                    $location.path('/error/' + error.statusText + '/' + error.status)
+                    throw error;
                 }
             ).catch(
                 function (error) {
@@ -125,7 +125,7 @@ angular.module('movieDBControllers',[])
                 });
         }
     })
-.controller('MovieDetailsController',function($scope, $location, $routeParams,$sce, dbService, MovieListService,NewTrailerService, myMovieConfig,MovieModelService) {
+.controller('MovieDetailsController',function($scope, $location,$routeParams,dbService,MovieListService,myMovieConfig,MovieModelService) {
 // 
    $scope.title = 'Movie Details';
    $scope.trailer=false;
@@ -136,9 +136,12 @@ angular.module('movieDBControllers',[])
 	}
    if ($routeParams.searchMovie)
 	$scope.category = $routeParams.category + '/' +  $routeParams.searchMovie;
-   var url = myMovieConfig.moviesEndpoint + '/' + id + '?api_key=' + myMovieConfig.apiKey;
+    var url = myMovieConfig.moviesEndpoint + '/' + id + '?api_key=' + myMovieConfig.apiKey;
+   //var url= myMovieConfig.movieDetailsEndPoint + id + '&token=' + myMovieConfig.myapifilmtoken;
+			
    MovieListService.getList(url).then(
       function(result){
+			console.log("in get result  ");
 			$scope.movie = result.data; 
             //url = myMovieConfig.rottenUri + '?i=' + $scope.movie.imdb_id + '&r=json&tomatoes=true';
 		    //url= myMovieConfig.movieDetailsEndPoint + $scope.movie.imdb_id + '&token=' + myMovieConfig.myapifilmstoken;
@@ -147,37 +150,40 @@ angular.module('movieDBControllers',[])
 			return $scope.movie.imdb_id; // parameter to next .then()
 			},
       function (error) {
-                    $location.path('/error/' + error.statusText + '/' + error.status)
+	                if (!error.statusText)
+						 error.statusText = "Error Obtaining Movie Details";
+					throw error;
+					//return;
             }
       )
      .then(  
 			function(imdbID){
-				 	var url = myMovieConfig.moviesTrailerEndPoint  + imdbID + '&token=' + myMovieConfig.myapifilmtoken;
-					//var url = myMovieConfig.moviesTrailerEndPoint  + 123 + '&token=' + myMovieConfig.myapifilmtoken;
-				 	MovieListService.getTrailerById(url).then(function(result) {
-						if (result.status != 200 || result.data.error)
+				MovieListService.getTrailerById(imdbID).then(
+					function(result) {
+						if (!result.status )
 							$scope.trailer = false;
 						else {
-
-						var trailer_id = result.data.data.trailer[0].trailer_id;
-				 		if (trailer_id.length > 0) {
-							console.log(trailer_id);
-							//$scope.$apply(function () {
 							$scope.trailer = true;
-							$scope.trailerSrc = $sce.trustAsResourceUrl("https://v.traileraddict.com/" + trailer_id);
-								//$scope.trailerSrc = $sce.trustAsResourceUrl(trailerSrc.data.trailer.src);
-							//});
-						}
-					    }
+							$scope.trailerSrc = result.src;
+						  }
+					}
+					,
+					function (error) {
+						error.statusText = error.statusText || 'Trailer Request failed';
+						error.status = 901
+						throw error;
 					})
-				},
-                function (error) {
-					$scope.data = error.data || 'Request failed';
-					$scope.status = error.status;
-                    $location.path('/error/' + $scope.data + '/' + $scope.status)
-                })
+			})		
       .catch(
-        function(error) { $location.path('/error/'+error.statusText +'/'+error.status)
+        function(error) { 
+			console.log("in details catch error");
+			if (!error.statusText)
+				error.statusText = "Error Obtaining Movie Details";
+			if (error.status == 901) // don't want to go to error screen just show details
+				console.log("error in obtaining trailer");
+			else		
+				$location.path('/error/'+ error.statusText +'/'+error.status)
+ 
       });
 
     $scope.showTrailer = function() {
@@ -235,9 +241,8 @@ function getMovies(){
           $scope.loading = false;
       },
        function (error) {
-					$scope.data = error.data || 'Request failed';
-					$scope.status = error.status;
-                    $location.path('/error/' + $scope.data + '/' + $scope.status)
+ 					error.statusText = error.statusText || 'Movie List Request failed';
+                   throw error;
                 }
       ).catch(
         function(error) { 
@@ -255,6 +260,11 @@ $scope.nextPage = function(){
   };
 
 })
+.controller('MovieErrorController', function ($scope, $routeParams) {
+        // show error message
+        $scope.message = $routeParams.message;
+        $scope.status = $routeParams.status;
+    })
 .controller('MovieSearchController', function ($scope, MovieListService, myMovieConfig, $location, $routeParams) {
         //get list of movies for display
         //parameter: search, contains title of movie to search for
@@ -271,8 +281,8 @@ $scope.nextPage = function(){
         function getMovies(search) {
             var movies = search; // search string for searching movies, sent to url as parameter
             //construct url
-           var url = myMovieConfig.moviesSearchEndpoint + movies + '&api_key=' +  
-						myMovieConfig.apiKey;
+           var url = myMovieConfig.moviesSearchEndpoint + movies + '&api_key=' +   myMovieConfig.apiKey;
+
 
             MovieListService.getList(url).then(//retrieve movies for display
                 function (result) { //success, got data back from api call
@@ -291,17 +301,13 @@ $scope.nextPage = function(){
                         $location.path('/error/' + result.data.error + '/' + result.statusText);
                 },
 				function (error) {
-					$scope.data = error.data || 'Request failed';
-					$scope.status = error.status;
-                    $location.path('/error/' + $scope.data + '/' + $scope.status)
+					error.statusText = error.statusText || 'Movie Search Request failed';
+                    throw error;
                 }
             ).catch(
                 function (error) { //error from api call
                     console.log('error', error);
-                    if ( error.message)
-                        $location.path('/error/' + error.message + '/' + 'Error');
-                    else
-                        $location.path('/error/' + error.data.status_message + '/' + error.status);
+					$location.path('/error/' + error.statusText + '/' + error.status);
                 });
         }
     });

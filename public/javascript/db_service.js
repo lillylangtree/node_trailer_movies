@@ -4,12 +4,14 @@ angular.module('DBServices',[])
 	var user = null;
 	var myFirebaseRef = getFirebase();
 
-	return  { getFirebase: getFirebase,
-    		  login: doLogin,
-    		  register: doRegister,
-    		  logout: logoutUser,
-    		  getUser: getUser
-            };
+	var service = { getFirebase: getFirebase,
+					login: doLogin,
+					register: doRegister,
+					logout: logoutUser,
+					getUser: getUser
+				};
+			
+	return service;		
 
     function getFirebase() {
 		return new Firebase(myMovieConfig.myDataRef);

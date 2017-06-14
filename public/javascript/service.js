@@ -1,21 +1,43 @@
+(function(){
+'use strict'
 
 angular.module('movieDBServices',['DBServices'])
-.factory('MovieListService',function($http,dbService,$q) {
+.factory('MovieListService',function($http,dbService,$q,$sce,myMovieConfig) {
 //   
-    return  { getList: getList,
-    		getFavoritesList: getFavoritesList,
-			getTrailerById: getTrailerById,
-            postFavorite: postFavorite,
-            deleteFavorite: deleteFavorite };
+    var service =   { 	getList: getList,
+						getFavoritesList: getFavoritesList,
+						getTrailerById: getTrailerById,
+						postFavorite: postFavorite,
+						deleteFavorite: deleteFavorite };
+			
+	return service;		
 
     function getList(url){
 			return $http.get(url);
         };
 		
-	function getTrailerById(url) {           //get a movie trailer with imdbID included in the url, constructed in the controller
-           return $http.get('/movieTrailer', {   //url built in controller, sent to node server acting as proxy
+	function getTrailerById(imdbID) {  
+			//get a movie trailer with imdbID  
+			var url = myMovieConfig.moviesTrailerEndPoint  + imdbID + '&token=' + myMovieConfig.myapifilmtoken;
+            return $http.get('/movieTrailer', {   //url   to node server acting as proxy
                 params: {url: url}            
-            });
+            })
+			.then(
+				function(result) {
+						var trailer = { status: false, id: 0, src: ""};
+						if (result.status != 200 || result.data.error)
+							trailer.status = false;
+						else {
+						  trailer.id = result.data.data.trailer[0].trailer_id;
+				 		  if (trailer.id.length > 0) {
+							trailer.status = true;
+							trailer.src = $sce.trustAsResourceUrl("https://v.traileraddict.com/" + trailer.id);
+						  } else
+						    trailer.status = false;
+					    }
+					return trailer;
+					}
+			);
         }; 	
 
     function postFavorite(movie) { //save a movie to the persistence layer, sent to server
@@ -115,3 +137,4 @@ angular.module('movieDBServices',['DBServices'])
 
         }
 });
+})()

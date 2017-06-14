@@ -1,7 +1,7 @@
 (function(){
 'use strict'
 
-angular.module('movieDBDirectives',[])
+angular.module('mapDirectives',[])
 .directive('makeMap', function() {
          
         var directive = {

@@ -1,7 +1,7 @@
 // defining the app module of the project
 // configure routing
 //
-angular.module('moviesDBApp', ['ngSanitize','ngRoute','movieDBControllers','TrailerMovieServices','utilityControllers','movieDBDirectives','movieDBServices','DBServices'])
+angular.module('moviesDBApp', ['ngSanitize','ngRoute','movieDBControllers','TrailerMovieServices','utilityControllers','movieDBDirectives','mapDirectives','movieDBServices','DBServices'])
 .constant("myMovieConfig", {
         "moviesEndpoint" : "https://api.themoviedb.org/3/movie",
 		"moviesSearchEndpoint" : "https://api.themoviedb.org/3/search/movie?query=",

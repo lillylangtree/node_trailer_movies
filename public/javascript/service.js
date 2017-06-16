@@ -46,7 +46,7 @@ angular.module('movieDBServices',['DBServices'])
         var uid = dbService.getUser().uid;
 		var dataRef = dbService.getFirebase().child(uid).child('movies') //reference to our table in our database
     	dataRef.on("value", function(snapshot) { //read data from database
-			data = snapshot.val(); //our movie data
+			var data = snapshot.val(); //our movie data
 
 			var idx = -1;//set to -1 as 0 is a valid array index number
 			if (data) {
@@ -81,7 +81,7 @@ angular.module('movieDBServices',['DBServices'])
             var uid = dbService.getUser().uid;
 			var dataRef = dbService.getFirebase().child(uid).child('movies') //reference to our table in our database
 	    	dataRef.on("value", function(snapshot) {
-				data = snapshot.val(); //our movie data
+				var data = snapshot.val(); //our movie data
 				var idx = -1;//set to -1 as 0 is a valid array index number
 			    for (var i = 0; i < data.length; i++) { //find movie in favorites list if already present
 			        if (data[i].imdbID === movie.imdbID) { //use the imdbID as the key

@@ -1,3 +1,4 @@
+var cors = require('cors');
 var express = require('express');
 // we need to ensure we 'require' all the modules we require for
 // our server to work
@@ -35,7 +36,7 @@ app.use(function (req, res, next) {
   console.log('Middleware Time:', Date.now())
   next()
 })
-app.get('/movieTrailer', function (req, res) {
+app.get('/movieTrailer',cors(), function (req, res) {
     //this request should include a url for processing
     //this url will make an api call based on the url value
     if (!req.query.url) { //check get parameters for required fields
